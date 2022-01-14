@@ -15,7 +15,6 @@ RUN systemctl enable docker.service
 RUN systemctl enable containerd.service
 WORKDIR /ocean
 COPY ./docker-entrypoint.sh /ocean/
-COPY ./c2d/ /ocean/
 COPY ./deployments/ /ocean/deployments/
 COPY ./docker-entrypoint.sh /ocean/
 ENTRYPOINT ["/ocean/docker-entrypoint.sh"]
