@@ -1,0 +1,42 @@
+FROM ubuntu:focal
+LABEL maintainer="Ocean Protocol <devops@oceanprotocol.com>"
+ENV DEBIAN_FRONTEND=noninteractive 
+# Set timezone:
+RUN ln -snf /usr/share/zoneinfo/$CONTAINER_TIMEZONE /etc/localtime && echo $CONTAINER_TIMEZONE > /etc/timezone
+RUN apt update
+RUN apt install -y curl git ca-certificates curl gnupg lsb-release
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt update
+RUN useradd -r c2d
+RUN mkdir /home/c2d
+RUN chown c2d.c2d /home/c2d
+RUN apt-get install -y docker-ce docker-ce-cli containerd.io
+RUN curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+RUN install minikube-linux-amd64 /usr/local/bin/minikube
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+RUN install kubectl /usr/local/bin/kubectl
+RUN chown :c2d /usr/local/bin/minikube
+RUN chown :c2d /usr/local/bin/kubectl
+RUN usermod -aG docker c2d
+RUN newgrp docker
+RUN systemctl enable docker.service
+RUN systemctl enable containerd.service
+RUN mkdir /ocean
+RUN chown c2d.c2d /ocean
+USER c2d
+COPY ./docker-entrypoint.sh /ocean/
+WORKDIR /ocean
+RUN git clone https://github.com/oceanprotocol/operator-service.git
+WORKDIR /ocean/operator-service
+ARG operator_service_branch=main
+RUN git checkout  $operator_service_branch
+WORKDIR /ocean
+RUN git clone https://github.com/oceanprotocol/operator-engine.git
+WORKDIR /ocean/operator-engine
+ARG operator_engine_branch=main
+RUN git checkout $operator_engine_branch
+EXPOSE 31000
+ENTRYPOINT ["/ocean/docker-entrypoint.sh"]
+
+
