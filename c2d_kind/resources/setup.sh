@@ -48,6 +48,17 @@ if [ ! -f /usr/bin/kubelet ]; then
     ln -s /var/lib/minikube/binaries/$KUBERNETES_VERSION/kubelet /usr/bin/kubelet
 fi
 
+#try to fetch the images
+echo "Fetch images...."
+kubeadm config images list
+docker pull k8s.gcr.io/kube-apiserver:v1.23.1
+docker pull k8s.gcr.io/kube-controller-manager:v1.23.1
+docker pull k8s.gcr.io/kube-scheduler:v1.23.1
+docker pull k8s.gcr.io/kube-proxy:v1.23.1
+docker pull k8s.gcr.io/pause:3.6
+docker pull k8s.gcr.io/etcd:3.5.1-0
+docker pull k8s.gcr.io/coredns/coredns:v1.8.6
+
 # fix minikube generated configs, this shouldn't be required if minikube behaved itself / had args for all the things
 replaceHost
 
