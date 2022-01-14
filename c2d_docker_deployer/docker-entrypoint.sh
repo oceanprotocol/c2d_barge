@@ -134,8 +134,11 @@ kubectl apply -f /ocean/deployments/operator-engine/binding.yml
 kubectl apply -f /ocean/deployments/operator-engine/operator.yml
 kubectl create -f /ocean/deployments/operator-service/postgres-configmap.yaml
 sleep 5
+#wait for op-service to be up
+kubectl wait -n ocean-operator deploy/operator-api --for=condition=available -timeout 10m 
 #initialize op-api 
 curl -X POST "http://${KIND_IP}:31000/api/v1/operator/pgsqlinit" -H  "accept: application/json"
-#kubectl -n ocean-operator port-forward svc/operator-api 8050
+#signal that we are ready
+touch /ocean/c2d/ready
 while true; do sleep 12 ; echo ""; done
 
