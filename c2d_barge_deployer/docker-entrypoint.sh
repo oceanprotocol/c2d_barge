@@ -148,7 +148,10 @@ sleep 5
 echo "Waiting for op-service deployment, so we can init pgsql" 
 kubectl wait -n ocean-operator deploy/operator-api --for=condition=available --timeout 10m 
 #initialize op-api 
-curl -X POST "http://${KIND_IP}:31000/api/v1/operator/pgsqlinit" -H  "accept: application/json"
+until $(curl --output /dev/null --silent --head --fail -X POST "http://${KIND_IP}:31000/api/v1/operator/pgsqlinit" -H  "accept: application/json"); do
+    printf '.'
+    sleep 5
+done
 echo "C2d is Up & running. Have fun!"
 #signal that we are ready
 touch /ocean/c2d/ready
