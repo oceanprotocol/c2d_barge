@@ -133,25 +133,31 @@ kubectl create -f /ocean/deployments/operator-service/postgres-storage.yaml
 kubectl create -f /ocean/deployments/operator-service/postgres-deployment.yaml
 kubectl create -f /ocean/deployments/operator-service/postgresql-service.yaml
 sleep 5
+#wait for pgsql to be up
+kubectl wait -n ocean-operator deploy/postgres --for=condition=available --timeout 10m
 kubectl apply -f /ocean/deployments/operator-service/deployment.yaml
 kubectl expose deployment operator-api --namespace=ocean-operator --port=8050
 kubectl create -f /ocean/deployments/operator-service/expose_service.yaml
-# move to op engine
-echo "Creating op-engine deployment:"
-kubectl config set-context --current --namespace ocean-compute
-kubectl apply -f /ocean/deployments/operator-engine/sa.yml
-kubectl apply -f /ocean/deployments/operator-engine/binding.yml
-kubectl apply -f /ocean/deployments/operator-engine/operator.yml
-kubectl create -f /ocean/deployments/operator-service/postgres-configmap.yaml
 sleep 5
 #wait for op-service to be up
-echo "Waiting for op-service deployment, so we can init pgsql" 
-kubectl wait -n ocean-operator deploy/operator-api --for=condition=available --timeout 10m 
-#initialize op-api 
+echo "Waiting for op-service deployment, so we can init pgsql"
+kubectl wait -n ocean-operator deploy/operator-api --for=condition=available --timeout 10m
+#initialize op-api
 until $(curl --output /dev/null --silent --head --fail -X POST "http://${KIND_IP}:31000/api/v1/operator/pgsqlinit" -H  "accept: application/json"); do
     printf '.'
     sleep 5
 done
+
+# move to op engine
+echo "Creating op-engine deployment:"
+kubectl config set-context --current --namespace ocean-compute
+kubectl create -f /ocean/deployments/operator-service/postgres-configmap.yaml
+kubectl apply -f /ocean/deployments/operator-engine/sa.yml
+kubectl apply -f /ocean/deployments/operator-engine/binding.yml
+kubectl apply -f /ocean/deployments/operator-engine/operator.yml
+sleep 5
+#wait for op-engine to be up
+kubectl wait -n ocean-compute deploy/ocean-compute-operator --for=condition=available --timeout 1s
 echo "C2d is Up & running. Have fun!"
 #signal that we are ready
 touch /ocean/c2d/ready
