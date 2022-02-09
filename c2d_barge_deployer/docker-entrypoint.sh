@@ -142,12 +142,13 @@ sleep 5
 #wait for op-service to be up
 echo "Waiting for op-service deployment, so we can init pgsql"
 kubectl wait -n ocean-operator deploy/operator-api --for=condition=available --timeout 10m
+sleep 10
 #initialize op-api
-until $(curl --output /dev/null --silent --head --fail -X POST "http://${KIND_IP}:31000/api/v1/operator/pgsqlinit" -H  "accept: application/json"); do
+until $(curl --silent --head --fail -X POST "http://${KIND_IP}:31000/api/v1/operator/pgsqlinit" -H  "accept: application/json"); do
     printf '.'
     sleep 5
 done
-
+echo "Pgsql initialized"
 # move to op engine
 echo "Creating op-engine deployment:"
 kubectl config set-context --current --namespace ocean-compute
