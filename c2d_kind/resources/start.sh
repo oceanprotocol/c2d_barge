@@ -37,6 +37,13 @@ else
     echo "no docker-registry/-credentials supplied"
 fi
 
+echo "Setting barge registry as trusted.."
+if [ -f "/certs/registry.crt" ]; then
+    mkdir /etc/docker/certs.d
+    mkdir /etc/docker/certs.d/172.15.0.11:5000
+    cp /certs/registry.crt /etc/docker/certs.d/172.15.0.11:5000/ca.crt
+fi
+
 echo "Starting config server.."
 supervisorctl -c /etc/supervisord.conf start config-serve
 

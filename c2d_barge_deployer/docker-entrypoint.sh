@@ -6,79 +6,13 @@ rm -f /ocean/c2d/ready
 cp /certs/registry.crt /usr/local/share/ca-certificates/
 update-ca-certificates
 #build compute custom images
-
-cd /ocean/
-if [ -z "$OPERATOR_SERVICE_IMAGE" ]; then
-        echo "no OPERATOR_SERVICE_IMAGE defined"
-	if [ -z "$OPERATOR_SERVICE_BRANCH" ]; then
-		OPERATOR_SERVICE_BRANCH="main"
-                echo "Switch to ${OPERATOR_SERVICE_BRANCH} as default"
-	fi
-        echo "Cloning op-service and checkout branch ${OPERATOR_SERVICE_BRANCH}"
-        git clone https://github.com/oceanprotocol/operator-service.git
-        cd ./operator-service
-        git checkout $OPERATOR_SERVICE_BRANCH
-        echo "docker build -t ${REGISTRY}operator-service:latest ."
-	docker build -t "${REGISTRY}operator-service:latest" .
-        echo "Pushing ${REGISTRY}operator-service:latest"
-	docker push ${REGISTRY}operator-service:latest
-        OPERATOR_SERVICE_IMAGE = ${REGISTRY}operator-service:latest
+if [ "${WAIT_FOR_C2DIMAGES+set}" = set ] && [ "$WAIT_FOR_C2DIMAGES" = yeah ]; then
+  echo "Waitting for images"
+  while [ ! -f "/ocean/c2d/imagesready" ]; do
+        sleep 2
+  done
 fi
-
 cd /ocean/
-if [ -z "$OPERATOR_ENGINE_IMAGE" ]; then
-        echo "no OPERATOR_ENGINE_IMAGE defined"
-	if [ -z "$OPERATOR_ENGINE_BRANCH" ]; then
-		OPERATOR_ENGINE_BRANCH="main"
-                echo "Switch to ${OPERATOR_ENGINE_BRANCH} as default"
-	fi
-        echo "Cloning op-engine and checkout branch ${OPERATOR_ENGINE_BRANCH}"
-        git clone https://github.com/oceanprotocol/operator-engine.git
-        cd ./operator-engine
-        git checkout $OPERATOR_ENGINE_BRANCH
-        echo "docker build -t ${REGISTRY}operator-engine:latest ."
-	docker build -t "${REGISTRY}operator-engine:latest" .
-        echo "Pushing ${REGISTRY}operator-engine:latest"
-	docker push ${REGISTRY}operator-engine:latest
-        OPERATOR_ENGINE_IMAGE = ${REGISTRY}operator-engine:latest
-fi
-
-cd /ocean/
-if [ -z "$POD_CONFIGURATION_IMAGE" ]; then
-        echo "no POD_CONFIGURATION_IMAGE defined"
-	if [ -z "$POD_CONFIGURATION_BRANCH" ]; then
-		POD_CONFIGURATION_BRANCH="main"
-                echo "Switch to ${POD_CONFIGURATION_BRANCH} as default"
-	fi
-        echo "Cloning pod-configuration and checkout branch ${POD_CONFIGURATION_BRANCH}"
-        git clone https://github.com/oceanprotocol/pod-configuration.git
-        cd ./pod-configuration
-        git checkout $POD_CONFIGURATION_BRANCH
-        echo "docker build -t ${REGISTRY}pod-configuration:latest ."
-	docker build -t "${REGISTRY}pod-configuration:latest" .
-        echo "Pushing ${REGISTRY}pod-configuration:latest"
-	docker push ${REGISTRY}pod-configuration:latest
-        POD_CONFIGURATION_IMAGE = ${REGISTRY}pod-configuration:latest
-fi
-
-
-cd /ocean/
-if [ -z "$POD_PUBLISHING_IMAGE" ]; then
-        echo "no POD_CONFIGURATION_IMAGE defined"
-	if [ -z "$POD_PUBLISHING_BRANCH" ]; then
-		POD_PUBLISHING_BRANCH="main"
-                echo "Switch to ${POD_PUBLISHING_BRANCH} as default"
-	fi
-        echo "Cloning pod-publishing and checkout branch ${POD_PUBLISHING_BRANCH}"
-        git clone https://github.com/oceanprotocol/pod-publishing.git
-        cd ./pod-publishing
-        git checkout $POD_PUBLISHING_BRANCH
-        echo "docker build -t ${REGISTRY}pod-publishing:latest ."
-	docker build -t "${REGISTRY}pod-publishing:latest" .
-        echo "Pushing ${REGISTRY}pod-publishing:latest"
-	docker push ${REGISTRY}pod-publishing:latest
-        POD_PUBLISHING_IMAGE = ${REGISTRY}pod-publishing:latest
-fi
 
 echo "Using ${OPERATOR_SERVICE_IMAGE} for operator-service"
 echo "Using ${OPERATOR_ENGINE_IMAGE} for operator-engine"
