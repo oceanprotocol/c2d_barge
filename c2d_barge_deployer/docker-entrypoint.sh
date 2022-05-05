@@ -92,7 +92,7 @@ kubectl apply -f /ocean/deployments/operator-engine/binding.yml
 kubectl apply -f /ocean/deployments/operator-engine/operator.yml
 sleep 5
 #wait for op-engine to be up
-kubectl wait -n ocean-compute deploy/ocean-compute-operator --for=condition=available --timeout 1s
+kubectl wait -n ocean-compute deploy/ocean-compute-operator --for=condition=available --timeout 10m
 echo "C2d is Up & running. Have fun!"
 #signal that we are ready
 touch /ocean/c2d/ready
