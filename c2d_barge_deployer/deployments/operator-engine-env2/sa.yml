@@ -2,5 +2,5 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: db-operator
-  namespace: ocean-compute
+  namespace: ocean-compute-env2
 

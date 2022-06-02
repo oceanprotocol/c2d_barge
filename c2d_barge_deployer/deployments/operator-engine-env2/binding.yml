@@ -10,4 +10,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: db-operator
-    namespace: ocean-compute
+    namespace: ocean-compute-env2
