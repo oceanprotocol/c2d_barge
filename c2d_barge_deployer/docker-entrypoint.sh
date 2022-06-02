@@ -68,8 +68,8 @@ cp config ~/.kube/config
 echo "Current k8 nodes:"
 kubectl get nodes
 kubectl create ns ocean-operator
-kubectl create ns ocean-operator-env2
 kubectl create ns ocean-compute
+kubectl create ns ocean-compute-env2
 echo "Creating op-service deployment:"
 kubectl config set-context --current --namespace ocean-operator
 kubectl create -f /ocean/deployments/operator-service/postgres-configmap.yaml
