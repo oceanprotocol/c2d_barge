@@ -4,7 +4,7 @@ metadata:
   labels:
     app: ocean-compute-operator
   name: ocean-compute-operator
-  namespace: ocean-compute
+  namespace: ocean-compute-env2
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -53,8 +53,10 @@ spec:
           value: standard
         - name: LOG_LEVEL
           value: DEBUG
+        - name: priceMinute
+          value: "1.2"
         - name: OPERATOR_PRIVATE_KEY
-          value: 0x531bcd9be1c5bb83052e47f064c43d901dfb6cd9334eb7f0d814bd26ab3bf328
+          value: 0x7bd1500a596565947907f5d01c11891b9a47b8180a450d4a6b665a8518ad2c9b
         - name: POD_CONFIGURATION_CONTAINER
           value: oceanprotocol/pod-configuration:latest
         - name: POD_PUBLISH_CONTAINER

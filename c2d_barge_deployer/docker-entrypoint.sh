@@ -26,11 +26,20 @@ sed -i "s!oceanprotocol/pod-configuration:latest!$POD_CONFIGURATION_IMAGE!g" /oc
 sed -i "s!oceanprotocol/pod-publishing:latest!$POD_PUBLISHING_IMAGE!g" /ocean/deployments/operator-engine/operator.yml
 sed -i "s!IPFS_SERVER_URL!${IPFS_GATEWAY}!g" /ocean/deployments/operator-engine/operator.yml
 sed -i "s!IPFS_OUTPUT_SERVER_URL!${IPFS_HTTP_GATEWAY}!g" /ocean/deployments/operator-engine/operator.yml
+sed -i "s!oceanprotocol/operator-engine:latest!$OPERATOR_ENGINE_IMAGE!g" /ocean/deployments/operator-engine-env2/operator.yml
+sed -i "s!oceanprotocol/pod-configuration:latest!$POD_CONFIGURATION_IMAGE!g" /ocean/deployments/operator-engine-env2/operator.yml
+sed -i "s!oceanprotocol/pod-publishing:latest!$POD_PUBLISHING_IMAGE!g" /ocean/deployments/operator-engine-env2/operator.yml
+sed -i "s!IPFS_SERVER_URL!${IPFS_GATEWAY}!g" /ocean/deployments/operator-engine-env2/operator.yml
+sed -i "s!IPFS_OUTPUT_SERVER_URL!${IPFS_HTTP_GATEWAY}!g" /ocean/deployments/operator-engine-env2/operator.yml
+
 echo "Doing cat /ocean/deployments/operator-service/deployment.yaml for debug purposes..."
 cat /ocean/deployments/operator-service/deployment.yaml
 echo "#####################################"
-echo "Doing cat /ocean/deployments/operator-engine/operator.ymlfor debug purposes..."
+echo "Doing cat /ocean/deployments/operator-engine/operator.yml for debug purposes..."
 cat /ocean/deployments/operator-engine/operator.yml
+echo "#####################################"
+echo "Doing cat /ocean/deployments/operator-engine-env2/operator.yml for debug purposes..."
+cat /ocean/deployments/operator-engine-env2/operator.yml
 echo "###########"
 echo "Waiting for the k8 config to be ready.."
 sleep 60
@@ -60,6 +69,7 @@ echo "Current k8 nodes:"
 kubectl get nodes
 kubectl create ns ocean-operator
 kubectl create ns ocean-compute
+kubectl create ns ocean-compute-env2
 echo "Creating op-service deployment:"
 kubectl config set-context --current --namespace ocean-operator
 kubectl create -f /ocean/deployments/operator-service/postgres-configmap.yaml
@@ -93,6 +103,15 @@ kubectl apply -f /ocean/deployments/operator-engine/operator.yml
 sleep 5
 #wait for op-engine to be up
 kubectl wait -n ocean-compute deploy/ocean-compute-operator --for=condition=available --timeout 10m
+echo "Creating op-engine-env2 deployment:"
+kubectl config set-context --current --namespace ocean-compute-env2
+kubectl create -f /ocean/deployments/operator-service/postgres-configmap.yaml
+kubectl apply -f /ocean/deployments/operator-engine-env2/sa.yml
+kubectl apply -f /ocean/deployments/operator-engine-env2/binding.yml
+kubectl apply -f /ocean/deployments/operator-engine-env2/operator.yml
+sleep 5
+#wait for op-engine to be up
+kubectl wait -n ocean-compute-env2 deploy/ocean-compute-operator --for=condition=available --timeout 10m
 echo "C2d is Up & running. Have fun!"
 #signal that we are ready
 touch /ocean/c2d/ready
