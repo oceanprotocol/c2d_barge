@@ -27,4 +27,5 @@ fi
 				 --client-ca-file=/var/lib/localkube/certs/ca.crt \
 				 --fail-swap-on=false \
 				 --kubeconfig=/etc/kubernetes/kubelet.conf \
-				 --cgroup-driver=cgroupfs
+				 --cgroup-driver=cgroupfs \
+				 --eviction-hard="nodefs.available<1%,imagefs.available<1%,nodefs.inodesFree<1%"
