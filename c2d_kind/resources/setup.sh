@@ -40,7 +40,7 @@ function replaceHost(){
 
 
 # start minikube, will fail, but s'ok is just for downloading things
-minikube start --vm-driver=none --kubernetes-version $KUBERNETES_VERSION --bootstrapper kubeadm --apiserver-ips $STATIC_IP,127.0.0.1 --apiserver-name minikube --extra-config=apiserver.advertise-address=$STATIC_IP --extra-config=kubeadm.ignore-preflight-errors=FileContent--proc-sys-net-bridge-bridge-nf-call-iptables,Service-Docker $MINIKUBE_EXTRA_ARGS || true
+minikube start --cert-expiration=26280h --vm-driver=none --kubernetes-version $KUBERNETES_VERSION --bootstrapper kubeadm --apiserver-ips $STATIC_IP,127.0.0.1 --apiserver-name minikube --extra-config=apiserver.advertise-address=$STATIC_IP --extra-config=kubeadm.ignore-preflight-errors=FileContent--proc-sys-net-bridge-bridge-nf-call-iptables,Service-Docker $MINIKUBE_EXTRA_ARGS || true
 if [ ! -f /usr/bin/kubeadm ]; then
     ln -s /var/lib/minikube/binaries/$KUBERNETES_VERSION/kubeadm /usr/bin/kubeadm
 fi
